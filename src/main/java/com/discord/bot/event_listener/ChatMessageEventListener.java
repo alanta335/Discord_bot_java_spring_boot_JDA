@@ -49,6 +49,7 @@ public class ChatMessageEventListener extends ListenerAdapter {
                 case "queue" -> handleQueueCommand(event);
                 case "ping" -> handlePingCommand(event);
                 case "ask" -> handleAskCommand(event);
+                case "fetch" -> handleFetchCommand(event);
                 default -> {
                     log.warn("Unknown command: {}", commandName);
                     event.reply("Unknown command: " + commandName).setEphemeral(true).queue();
@@ -177,6 +178,22 @@ public class ChatMessageEventListener extends ListenerAdapter {
         long gatewayPing = event.getJDA().getGatewayPing();
         event.reply("🏓 Pong! Gateway ping: " + gatewayPing + "ms").queue();
         log.info("Ping command executed, gateway ping: {}ms", gatewayPing);
-        chatService.fetchAllMessages(event.getChannel().asTextChannel());
+    }
+
+    private void handleFetchCommand(SlashCommandInteractionEvent event) {
+        event.deferReply().queue();
+        try {
+            if (event.getChannel() == null || !event.getChannel().getType().isMessage()) {
+                event.getHook().sendMessage("❌ This command can only be used in a text channel.").queue();
+                return;
+            }
+            
+            chatService.fetchAllMessages(event.getChannel().asTextChannel());
+            event.getHook().sendMessage("✅ Successfully fetched all messages from this channel.").queue();
+            log.info("Fetch command executed by user: {}", event.getUser().getName());
+        } catch (Exception e) {
+            log.error("Error fetching messages", e);
+            event.getHook().sendMessage("❌ An error occurred while fetching messages.").queue();
+        }
     }
 }

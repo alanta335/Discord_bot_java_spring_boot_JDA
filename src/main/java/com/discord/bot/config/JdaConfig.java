@@ -72,7 +72,8 @@ public class JdaConfig {
                     Commands.slash("queue", "Show the current queue"),
                     Commands.slash("ping", "Check if the bot is responding"),
                     Commands.slash("ask", "Ask a question to the bot")
-                            .addOption(OptionType.STRING, "question", "Your question", true)
+                            .addOption(OptionType.STRING, "question", "Your question", true),
+                    Commands.slash("fetch", "Fetch all messages from the current channel")
             );
             commands.queue(
                     success -> log.info("Successfully registered {} slash commands", success.size()),
